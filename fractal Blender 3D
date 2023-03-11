@@ -1,0 +1,51 @@
+import bpy 
+import math 
+import numpy as np 
+ 
+# Define the iteration count 
+max_iterations = 100 
+ 
+# Define the complex plane bounds 
+xmin, xmax, ymin, ymax = -2, 2, -2, 2 
+ 
+# Define the resolution 
+width, height = 500, 500 
+ 
+# Create a new mesh object 
+mesh = bpy.data.meshes.new(name="Mandelbrot") 
+ 
+# Create a new object and link it to the scene 
+obj = bpy.data.objects.new(name="Mandelbrot", object_data=mesh) 
+bpy.context.scene.collection.objects.link(obj) 
+ 
+# Create a list of vertices 
+vertices = [] 
+ 
+# Loop over each pixel in the image 
+for x in range(width): 
+    for y in range(height): 
+        # Map the pixel coordinates to the complex plane 
+        zx = xmin + (xmax - xmin) * x / width 
+        zy = ymin + (ymax - ymin) * y / height 
+ 
+        # Initialize the iteration count and the complex constant 
+        z, c = 0, complex(zx, zy) 
+ 
+        # Perform the iteration 
+        for i in range(max_iterations): 
+            z = z ** 2 + c 
+ 
+            # Check if the absolute value of z is greater than 2 
+            if abs(z) > 2: 
+                break 
+ 
+        # Add the vertex to the list if the iteration count is less than the maximum 
+        if i < max_iterations - 1: 
+            vertices.append((x, y, 0)) 
+ 
+# Create a new mesh from the vertices 
+mesh.from_pydata(vertices, [], []) 
+ 
+# Update the mesh and the object 
+mesh.update() 
+obj.update_tag() 
